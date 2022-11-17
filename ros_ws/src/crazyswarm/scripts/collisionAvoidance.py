@@ -39,7 +39,18 @@ def main():
         default=1,
         help="Repeat the experiment this many times, without resetting start positions.",
     )
-    args, unknown = parser.parse_known_args()
+    
+    args, unknown = parser.parse_known_args() #return two outputs
+    
+    #demonstration of line above
+    #import argparse
+    #parser = argparse.ArgumentParser()
+    #parser.add_argument('--foo')
+    #args, unknown = parser.parse_known_args(['--foo', 'BAR', 'spam'])
+    #print(args)
+    #Namespace(foo='BAR')
+    #print(unknown)
+    #['spam']
 
     if args.assign:
         duration = 3.0
@@ -47,22 +58,22 @@ def main():
         duration = 10.0
 
     # Construct the Crazyswarm objects.
-    rows, cols = 3, 5
-    N = rows * cols
-    crazyflies_yaml = util.grid_yaml(rows, cols, spacing=0.5)
-    swarm = pycrazyswarm.Crazyswarm(crazyflies_yaml=crazyflies_yaml, parent_parser=parser)
-    timeHelper = swarm.timeHelper
-    cfs = swarm.allcfs.crazyflies
+    rows, cols = 30, 30
+    N = rows * cols  
+    crazyflies_yaml = util.grid_yaml(rows, cols, spacing=1) #Generate crazyflies.yaml string for a grid in the XZ plane
+    swarm = pycrazyswarm.Crazyswarm(crazyflies_yaml=crazyflies_yaml, parent_parser=parser) #not sure what this functions but it is necssary
+    timeHelper = swarm.timeHelper #help handling sleeping situations of the drone
+    cfs = swarm.allcfs.crazyflies #create an instance for each crazyflie
 
     # Tell the visualizer to draw collision volume ellipsoids. Ellipsoids
     # change from green to red when a collision occurs. Make the radii slightly
     # smaller than the radii used for the collision avoidance algorithm as a
     # fudge factor.
     #
-    # To show collisions on purpose, use --noavoid without --assign.
-    xy_radius = 0.125
-    radii = 1.0 * xy_radius * np.array([1.0, 1.0, 3.0])
-    timeHelper.visualizer.showEllipsoids(0.95 * radii)
+    # To show collisions on purpose, use --noavoid without --assign. 
+    xy_radius = 0.125 #the raduis of the shield protection
+    radii = 1.0 * xy_radius * np.array([1.0, 1.0, 3.0]) 
+    timeHelper.visualizer.showEllipsoids(0.95 * radii) #No-op object conforming to the Visualizer API used in simulation scripts. Maintains the property that scripts should not know/care if they are running in simulation or not.
 
     swarm.allcfs.takeoff(targetHeight=Z, duration=Z+1.0)
     timeHelper.sleep(Z + 2.0)
